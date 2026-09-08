@@ -1,0 +1,196 @@
+{% extends "layout.html" %}
+{% block link %}
+<link rel="stylesheet" media="screen, print"
+    href="{{ url_for('static', filename='css/datagrid/datatables/datatables.bundle.css') }}">
+<link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/fa-solid.css') }}">
+{% endblock link %}
+
+{% block pageheader %}
+<!-- the #js-page-content id is needed for some plugins to initialize -->
+<main id="js-page-content" role="main" class="page-content">
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">history</li>
+        <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
+    </ol>
+    <div class="subheader">
+        <h1 class="subheader-title">
+            History
+        </h1>
+    </div>
+    {% endblock pageheader %}
+
+    {% block content %}
+    <div class="row">
+        <div class="col-xl-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        Admin History
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-action="panel-collapse"
+                            class="btn btn-primary btn-xs btn-icon rounded-circle"
+                            style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                            data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen"
+                            class="btn btn-primary btn-xs btn-icon rounded-circle"
+                            style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                            data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <button data-target="#example-modal-centered-transparent_info"
+                            data-toggle="modal" data-offset="0,10"
+                            class="btn btn-primary btn-xs btn-icon rounded-circle"
+                            style="margin-right: 5px" data-original-title="Info"><i
+                                class="fal fa-info"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <!-- datatable start -->
+                        <table id="history-datatable"
+                            class="table table-bordered table-hover table-striped w-100 my-datatable">
+                            <thead class="bg-primary-700">
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Username</th>
+                                    <th>Action</th>
+                                    <th>Target</th>
+                                    <th>TimeStamp</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Username</th>
+                                    <th>Action</th>
+                                    <th>Target</th>
+                                    <th>TimeStamp</th>
+                                    <th>Details</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                        <!-- datatable end -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endblock content %}
+
+    {% block script %}
+    <script src="{{ url_for('static', filename='js/datagrid/datatables/datatables.bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/datagrid/datatables/datatables.export.js') }}"></script>
+
+    <script>
+        $(document).ready(function () {
+
+        // initialize datatable
+        $('#history-datatable').dataTable(
+            {
+                responsive: true,
+                ajax: "/get-history",
+                order: [],
+                columns: [
+                    {"data": "id"},
+                    {"data": "username"},
+                    {"data": "action"},
+                    {"data": "target"},
+                    {"data": "timestamp"},
+                    {
+                        "data": "id",
+                        "render": function(data, type, full, meta) {
+                            return '<div class="row float-right mr-1">'+
+                                            '<div class="mr-1">'+
+                                                '<a href="/history/'+data+'" class="btn btn-outline-primary btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed">'+
+                                                    '<i class="fal fa-info"></i>'+
+                                                '</a>'+
+                                                '</button>'+
+                                            '</div>'+
+                                        '</div>';
+                        }
+                    },
+                    
+                ],
+                lengthChange: true,
+                language: {
+                    "lengthMenu": "_MENU_"
+                },
+                fixedHeader: true,
+                dom:
+                    /*  --- Layout Structure
+                        --- Options
+                        l   -   length changing input control
+                        f   -   filtering input
+                        t   -   The table!
+                        i   -   Table information summary
+                        p   -   pagination control
+                        r   -   processing display element
+                        B   -   buttons
+                        R   -   ColReorder
+                        S   -   Select
+
+                        --- Markup
+                        < and >             - div element
+                        <"class" and >      - div with a class
+                        <"#id" and >        - div with an ID
+                        <"#id.class" and >  - div with an ID and a class
+
+                        --- Further reading
+                        https://datatables.net/reference/option/dom
+                        --------------------------------------
+                    */
+                    "<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'fl><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                buttons: [
+                    // {
+                    //     extend:    'colvis',
+                    //     text:      'Column Visibility',
+                    //     titleAttr: 'Col visibility',
+                    //     className: 'mr-sm-3'
+                    // },
+                    {
+                        extend: 'pdfHtml5',
+                        text: 'PDF',
+                        titleAttr: 'Generate PDF',
+                        className: 'btn-outline-danger btn-sm mr-1'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Excel',
+                        titleAttr: 'Generate Excel',
+                        className: 'btn-outline-success btn-sm mr-1'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: 'CSV',
+                        titleAttr: 'Generate CSV',
+                        className: 'btn-outline-primary btn-sm mr-1'
+                    },
+                    {
+                        extend: 'copyHtml5',
+                        text: 'Copy',
+                        titleAttr: 'Copy to clipboard',
+                        className: 'btn-outline-primary btn-sm mr-1'
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Print',
+                        titleAttr: 'Print Table',
+                        className: 'btn-outline-primary btn-sm'
+                    }
+                ]
+            });
+
+        });
+
+    </script>
+</main>
+{% endblock script %}
