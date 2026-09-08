@@ -1,0 +1,132 @@
+{% extends "layout.html" %}
+{% block link %}
+    <link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/fa-solid.css') }}">
+          rel="stylesheet">
+{% endblock link %}
+
+{% block pageheader %}
+    <!-- the #js-page-content id is needed for some plugins to initialize -->
+    <main id="js-page-content" role="main" class="page-content">
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ title | capitalize }}</li>
+        <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
+    </ol>
+    <div class="subheader">
+        <h1 class="subheader-title">
+            {{ title | capitalize }}
+        </h1>
+    </div>
+{% endblock pageheader %}
+
+{% block content %}
+        <div class="row">
+            <div class="col-xl-12">
+                <div id="panel-1" class="panel">
+                    <div class="panel-hdr bg-primary-700">
+                        <h2>
+                            Users Information
+                        </h2>
+                    </div>
+                    <div class="panel-container show">
+                        <div class="panel-content">
+                           <form id="js-login" novalidate="" method="POST" action="/edit-user">
+                               {{ form.hidden_tag() }}
+                               <input type="hidden" name="user_id" value="{{user_id}}" />
+                                <div class="form-group">
+                                    {{ form.name.label(class="form-label", placeholder="name", autocomplete="off") }}
+                                    {% if form.name.errors %}
+                                        {{ form.name(class="form-control", placeholder="name", autocomplete="off") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.name.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.name(class="form-control", placeholder="name", autocomplete="off") }}
+                                    {% endif %}
+                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form.email.label(class="form-label", placeholder="email", autocomplete="off") }}
+                                    {% if form.email.errors %}
+                                        {{ form.email(class="form-control", placeholder="email", autocomplete="off") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.email.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.email(class="form-control", placeholder="email", autocomplete="off") }}
+                                    {% endif %}
+                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                </div>
+                                <div class="form-group">
+                                    {{ form.username.label(class="form-label", placeholder="username", autocomplete="off") }}
+                                    {% if form.username.errors %}
+                                        {{ form.username(class="form-control", placeholder="username", autocomplete="off") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.username.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.username(class="form-control", placeholder="username", autocomplete="off") }}
+                                    {% endif %}
+                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                </div>
+                                <!-- Linux User Id -->
+                                <div class="form-group">
+                                    {{ form.linux_user_id.label(class="form-label") }}
+                                    {% if form.linux_user_id.errors %}
+                                        {{ form.linux_user_id(class="form-control", placeholder="Linux User Id") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.linux_user_id.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.linux_user_id(class="form-control", placeholder="Linux User Id") }}
+                                    {% endif %}
+                                </div>
+                                <!-- Department -->
+                                <div class="form-group">
+                                    {{ form.department.label(class="form-label") }}
+                                    {% if form.department.errors %}
+                                        {{ form.department(class="form-control", placeholder="Department") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.department.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.department(class="form-control", placeholder="Department") }}
+                                    {% endif %}
+                                </div>
+                                <!-- Security Group -->
+                                <div class="form-group">
+                                    {{ form.security_group.label(class="form-label") }}
+                                    {% if form.security_group.errors %}
+                                        {{ form.security_group(class="form-control", placeholder="Security Group") }}
+                                        <div class="invalid-feedback">
+                                            {% for error in form.security_group.errors %}
+                                                <span>{{ error }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        {{ form.security_group(class="form-control", placeholder="Security Group") }}
+                                    {% endif %}
+                                </div>
+                                <div class="row no-gutters">
+                                    <div class="col-md-4 ml-auto text-right">
+                                        <button id="js-login-btn" type="submit" class="btn btn-primary btn-lg mt-3">Submit
+                                        </button>
+                                    </div>
+                                </div>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock content %}
