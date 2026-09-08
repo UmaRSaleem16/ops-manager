@@ -1,0 +1,486 @@
+{% extends "layout.html" %}
+{% block link %}
+    <link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/datagrid/datatables/datatables.bundle.css') }}">
+    <link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/fa-solid.css') }}">
+    <!-- <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet"> -->
+{% endblock link %}
+
+{% block pageheader %}
+    <!-- the #js-page-content id is needed for some plugins to initialize -->
+    <main id="js-page-content" role="main" class="page-content">
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ title | capitalize }}</li>
+        <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
+    </ol>
+    <div class="subheader">
+        <h1 class="subheader-title">
+            {{ title | capitalize }}
+        </h1>
+    </div>
+{% endblock pageheader %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        Users Information
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-target="#add-user"
+                        class="btn btn-primary btn-xs btn-icon rounded-circle"
+                        style="margin-right: 5px" data-toggle="modal" data-offset="0,10"
+                        data-original-title="Collapse"><i class="fal fa-plus"></i>
+                    </button>
+                        <button data-action="panel-collapse" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <!-- <button data-target="#example-modal-centered-transparent_info" data-toggle="modal"
+                                data-offset="0,10" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-original-title="Info"><i class="fal fa-info"></i>
+                        </button> -->
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <!-- datatable start -->
+                        <table id="dt-basic-example" class="table table-bordered table-hover table-striped w-100">
+                            <thead class="bg-primary-700">
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Linux User ID</th>
+                                <th>Department</th>
+                                <th>Security Group</th>
+                                <th>Control</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Linux User ID</th>
+                                <th>Department</th>
+                                <th>Security Group</th>
+                                <th>Control</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <!-- datatable end -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Show JSON Data -->
+            <div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000" id="jsonModal">
+                <div class="modal-dialog modal-dialog-centered modal-transparent" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title text-white"><small class="m-0 text-white opacity-90" id="json-display-header"></small></h4>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <div class="modal-body text-right">
+                            <button class="btn btn-md btn-icon position-absolute text-white border border-1" style="right: 10px" title="Copy JSON" onclick="copyJson()">
+                                <i class="fal fa-copy"></i>
+                            </button>
+                            <pre class="text-white text-left" id="jsonData"></pre>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            
+            
+            
+            <div class="modal fade example-modal-centered-transparent_info" id="add-user" tabindex="-1" data-focus="false"
+                role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title ">
+                                Add User
+                            </h4>
+                            <button type="button" class="close text-black-50" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="">
+                                <div class="">
+                                    <div class="" id="v-pills-tabContent">
+                                        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                                             aria-labelledby="v-pills-home-tab">
+                                             <form id="js-login" novalidate="" method="POST" action="/create-user">
+                                                {{ form.hidden_tag() }}
+                                                <div class="form-group">
+                                                    {{ form.title.label(class="form-label", placeholder="Title", autocomplete="off") }}
+                                                    {% if form.title.errors %}
+                                                        {{ form.title(class="form-control", placeholder="Title", autocomplete="off") }}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in form.title.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ form.title(class="form-control", placeholder="Title", autocomplete="off") }}
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ form.name.label(class="form-label", placeholder="name", autocomplete="off") }}
+                                                    {% if form.name.errors %}
+                                                        {{ form.name(class="form-control", placeholder="name", autocomplete="off") }}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in form.name.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ form.name(class="form-control", placeholder="name", autocomplete="off") }}
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ form.email.label(class="form-label", placeholder="email", autocomplete="off") }}
+                                                    {% if form.email.errors %}
+                                                        {{ form.email(class="form-control", placeholder="email", autocomplete="off") }}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in form.email.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ form.email(class="form-control", placeholder="email", autocomplete="off") }}
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ form.username.label(class="form-label", placeholder="username", autocomplete="off") }}
+                                                    {% if form.username.errors %}
+                                                        {{ form.username(class="form-control", placeholder="username", autocomplete="off") }}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in form.username.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ form.username(class="form-control", placeholder="username", autocomplete="off") }}
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <!-- Linux User Id -->
+                                                <div class="form-group">
+                                                    {{ form.linux_user_id.label(class="form-label") }}
+                                                    {% if form.linux_user_id.errors %}
+                                                        {{ form.linux_user_id(class="form-control", placeholder="Linux User Id") }}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in form.linux_user_id.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ form.linux_user_id(class="form-control", placeholder="Linux User Id") }}
+
+                                                    {% endif %}
+                                                </div>
+                                                <!-- Department -->
+                                                <div class="form-group">
+                                                    {{ form.department.label(class="form-label") }}
+                                                    {% if form.department.errors %}
+                                                        {{ form.department(class="form-control", placeholder="Department") }}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in form.department.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ form.department(class="form-control", placeholder="Department") }}
+                                                    {% endif %}
+                                                </div>
+                                                <!-- Security Group -->
+                                                <div class="form-group">
+                                                    {{ form.security_group.label(class="form-label") }}
+                                                    {% if form.security_group.errors %}
+                                                        {{ form.security_group(class="form-control select-control", placeholder="-- Select Security Group --") }}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in form.security_group.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ form.security_group(class="form-control select-control ", placeholder="-- Select Security Group --") }}
+                                                    {% endif %}
+                                                </div>
+                                                <div class="row no-gutters">
+                                                    <div class="col-md-4 ml-auto text-right">
+                                                        <button id="js-login-btn" type="submit" class="btn btn-primary btn-lg mt-3">Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
+                                             aria-labelledby="v-pills-profile-tab">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/datagrid/datatables/datatables.bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/datagrid/datatables/datatables.export.js') }}"></script>
+    <script>
+        
+        {% raw %}
+
+        function copyJson(){
+            // Get the text inside the <code> element
+            var textToCopy = document.getElementById("jsonData").innerText;
+
+            // Create a temporary textarea element
+            var textarea = document.createElement("textarea");
+            textarea.value = textToCopy;
+
+            // Append the textarea to the body
+            document.body.appendChild(textarea);
+
+            // Select the text inside the textarea
+            textarea.select();
+
+            // Copy the selected text to the clipboard
+            document.execCommand("copy");
+
+            // Remove the temporary textarea
+            document.body.removeChild(textarea);
+
+            // Alert the user that the text has been copied
+            // alert("Text copied to clipboard!");
+        }
+        // Function to display JSON data in the modal
+        async function displayJSON(id, name) {
+            document.getElementById('json-display-header').textContent = name;
+            // document.getElementById('jsonData').textContent = JSON.stringify(user, null, 4);
+            
+            response = await fetch('/user-json/' + id, 
+            {
+                headers: {"Content-Type": "application/json" },
+                method: 'GET',
+                // body: JSON.stringify({'user_id': user_id})
+            });
+
+            result = await response.json()
+            if(result.success){
+                document.getElementById('jsonData').textContent = JSON.stringify(result.data, null, 4);                
+            }
+            else{
+                $('#jsonModal').modal('hide');
+                console.error(`Error occurred while fetching user details. ${result.error}`)
+                toastr.warning("Error while getting user details. check console for details.")
+            }
+            
+        }
+
+
+            /* Delete User */
+        async function deleteUser(id, name) {
+            var swalWithBootstrapButtons = Swal.mixin(
+            {
+                customClass:
+                {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-danger mr-2"
+                },
+                buttonsStyling: false
+            });
+
+            result = await swalWithBootstrapButtons.fire(
+            {
+                title: "Are you sure?",
+                html: `You are deleting user <mark><strong>${name}</strong></mark>, You won't be able to revert this!`,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+                reverseButtons: true
+            });
+            if(result.value){
+                try{
+                    del_response = await fetch('/user/' + id, {method: 'DELETE',})
+                    response = await del_response.json()
+                    if (response.success) {
+                        await swalWithBootstrapButtons.fire("Deleted!",`user <mark><strong>${name}</strong></mark> has been deleted.`,"success");
+                        window.location.href = '/users'; // Redirect to home or another appropriate page
+                    }
+                    else{
+                            console.error("Error occurred while deleting.")
+                            toastr.warning(response.error)
+                    }
+                }
+                catch(e){
+                    console.error(e);
+                    toastr.warning(`Exception: ${e.message}`);
+                }
+            }
+            else{
+                swalWithBootstrapButtons.fire("Cancelled",`Deletion of user <mark><strong>${name}</strong></mark> is cancelled, you are safe :)`,"error");
+            }
+        }
+
+        {% endraw %}
+
+        $(document).ready(function () {
+            var queryParams = new URLSearchParams(window.location.search);
+
+            var ajaxUrl = "/get-users";
+            // Check if a specific query parameter exists
+            if (queryParams.has('group')) {
+                // The query parameter 'paramName' exists in the address bar
+                var paramValue = queryParams.get('group');
+                var ajaxUrl = ajaxUrl + "?group=" + paramValue;
+            }
+
+            $('#dt-basic-example').dataTable(
+                {
+                    responsive: true,
+                    serverSide: true,
+                    ajax: ajaxUrl,
+                    columns: [
+                        {"data": "id"},
+                        {"data": "title"},
+                        {"data": "name"},
+                        {
+                            "data": "username",
+                            "render": function(data, type, full, meta) {
+                                return '<a href="/user/' + data + '">'+data+'</a>';
+                            }
+                        },
+                        {"data": "email"},
+                        {"data": "linux_user_id"},
+                        {"data": "department"},
+                        {"data": "group_name"},
+                        {
+                            "data": "id",
+                            "render": function(data, type, full, meta) {
+                                return '<div class="row float-right mr-1">'+
+                                        '<div class="mr-1">'+
+                                            '<button class="btn btn-outline-primary btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" data-toggle="modal" data-target="#jsonModal" type="button" onclick=\'displayJSON('+full.id+',"'+full.name+'")\'>'+
+                                                '<i class="fal fa-info"></i>'+
+                                            '</button>'+
+                                        '</div>'+
+                                        '<form class="mr-1">'+
+                                            '<input type="hidden" id="id_'+full.id+'" name="id_'+full.id+'" value="'+full.id+'" />'+
+                                            '<input type="hidden" id="username_'+full.id+'" name="username_'+full.id+'" value="'+full.username+'" />'+
+                                            '<button class="btn btn-outline-danger btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" onclick=\'deleteUser('+full.id+', "'+full.name+'")\'>'+
+                                                '<i class="fal fa-trash"></i>'+
+                                            '</button>'+
+                                        '</form>'+
+                                    '</div>';
+                            }
+                        },
+                    ],
+                    lengthChange: true,
+                    language: {
+                        "lengthMenu": "_MENU_"
+                    },
+                    fixedHeader: true,
+                    dom:
+                    /*  --- Layout Structure
+                        --- Options
+                        l   -   length changing input control
+                        f   -   filtering input
+                        t   -   The table!
+                        i   -   Table information summary
+                        p   -   pagination control
+                        r   -   processing display element
+                        B   -   buttons
+                        R   -   ColReorder
+                        S   -   Select
+
+                        --- Markup
+                        < and >             - div element
+                        <"class" and >      - div with a class
+                        <"#id" and >        - div with an ID
+                        <"#id.class" and >  - div with an ID and a class
+
+                        --- Further reading
+                        https://datatables.net/reference/option/dom
+                        --------------------------------------
+                     */
+                        "<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'fl><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+                        "<'row'<'col-sm-12'tr>>" +
+                        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                    buttons: [
+                        // {
+                        //     extend:    'colvis',
+                        //     text:      'Column Visibility',
+                        //     titleAttr: 'Col visibility',
+                        //     className: 'mr-sm-3'
+                        // },
+                        {
+                            extend: 'pdfHtml5',
+                            text: 'PDF',
+                            titleAttr: 'Generate PDF',
+                            className: 'btn-outline-danger btn-sm mr-1'
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            text: 'Excel',
+                            titleAttr: 'Generate Excel',
+                            className: 'btn-outline-success btn-sm mr-1'
+                        },
+                        {
+                            extend: 'csvHtml5',
+                            text: 'CSV',
+                            titleAttr: 'Generate CSV',
+                            className: 'btn-outline-primary btn-sm mr-1'
+                        },
+                        {
+                            extend: 'copyHtml5',
+                            text: 'Copy',
+                            titleAttr: 'Copy to clipboard',
+                            className: 'btn-outline-primary btn-sm mr-1'
+                        },
+                        {
+                            extend: 'print',
+                            text: 'Print',
+                            titleAttr: 'Print Table',
+                            className: 'btn-outline-primary btn-sm'
+                        }
+                    ]
+                });
+
+        });
+        
+
+    </script>
+    </main>
+{% endblock script %}

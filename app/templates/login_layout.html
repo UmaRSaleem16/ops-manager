@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{% block title %}{{ title }}{% endblock %}</title>
+        <meta name="description" content="Login">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+        <!-- Call App Mode on ios devices -->
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <!-- Remove Tap Highlight on Windows Phone IE -->
+        <meta name="msapplication-tap-highlight" content="no">
+        <!-- base css -->
+
+        <link id="vendorsbundle" rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/vendors.bundle.css') }}">
+        <link id="appbundle" rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/app.bundle.css') }}">
+        <link id="mytheme" rel="stylesheet" media="screen, print" href="#">
+        <link id="myskin" rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/skins/skin-master.css') }}">
+        <!-- Place favicon.ico in the root directory -->
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='img/favicon/apple-touch-icon.png') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='img/favicon/favicon-32x32.png') }}">
+        <link rel="mask-icon" color="#5bbad5" href="{{ url_for('static', filename='img/favicon/safari-pinned-tab.svg') }}">
+        <link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/fa-brands.css') }}">
+        <link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/page-login-alt.css') }}">
+    </head>
+    <body>
+        <script>
+            'use strict';
+
+            var classHolder = document.getElementsByTagName("BODY")[0],
+                themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) :
+                {},
+                themeURL = themeSettings.themeURL || '',
+                themeOptions = themeSettings.themeOptions || '';
+            if (themeSettings.themeOptions)
+            {
+                classHolder.className = themeSettings.themeOptions;
+                console.log("%c✔ Theme settings loaded", "color: #148f32");
+            }
+            else
+            {
+                console.log("%c✔ Heads up! Theme settings is empty or does not exist, loading default settings...", "color: #ed1c24");
+            }
+            if (themeSettings.themeURL && !document.getElementById('mytheme'))
+            {
+                var cssfile = document.createElement('link');
+                cssfile.id = 'mytheme';
+                cssfile.rel = 'stylesheet';
+                cssfile.href = themeURL;
+                document.getElementsByTagName('head')[0].appendChild(cssfile);
+
+            }
+            else if (themeSettings.themeURL && document.getElementById('mytheme'))
+            {
+                document.getElementById('mytheme').href = themeSettings.themeURL;
+            }
+            var saveSettings = function()
+            {
+                themeSettings.themeOptions = String(classHolder.className).split(/[^\w-]+/).filter(function(item)
+                {
+                    return /^(nav|header|footer|mod|display)-/i.test(item);
+                }).join(' ');
+                if (document.getElementById('mytheme'))
+                {
+                    themeSettings.themeURL = document.getElementById('mytheme').getAttribute("href");
+                };
+                localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
+            }
+            var resetSettings = function()
+            {
+                localStorage.setItem("themeSettings", "");
+            }
+
+        </script>
+        <div class="page-wrapper auth">
+            <div class="page-inner">
+                <div class="page-content-wrapper bg-transparent m-0">
+                    <div class="flex-1">
+                        <div class="container py-4 py-lg-5 my-lg-5 px-4 px-sm-0">
+                            {% with messages = get_flashed_messages(with_categories=true) %}
+                                {% if messages %}
+                                    {% for category, message in messages %}
+                                        <div class="flash-alert alert alert-{{ category }}">
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                            {% endwith %}
+                            <!-- <div class="blankpage-form-field"> -->
+                                <!-- <div class="page-logo m-0 w-100 align-items-center justify-content-center rounded border-bottom-left-radius-0 border-bottom-right-radius-0 px-4">
+                                    <a href="javascript:void(0)" class="page-logo-link press-scale-down d-flex align-items-center">
+                                        <span class="page-logo-text mr-1">Ops Manager</span>
+                                    </a>
+                                </div> -->
+                            {% block content %}{% endblock %}
+                            <!-- </div> -->
+                            <video poster="{{ url_for('static', filename='img/backgrounds/clouds.png') }}" id="bgvid" playsinline autoplay muted loop>
+                                <source src="{{ url_for('static', filename='media/video/cc.webm') }}" type="video/webm">
+                                <source src="{{ url_for('static', filename='media/video/cc.mp4') }}" type="video/mp4">
+                            </video>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p id="js-color-profile" class="d-none">
+            <span class="color-primary-50"></span>
+            <span class="color-primary-100"></span>
+            <span class="color-primary-200"></span>
+            <span class="color-primary-300"></span>
+            <span class="color-primary-400"></span>
+            <span class="color-primary-500"></span>
+            <span class="color-primary-600"></span>
+            <span class="color-primary-700"></span>
+            <span class="color-primary-800"></span>
+            <span class="color-primary-900"></span>
+            <span class="color-info-50"></span>
+            <span class="color-info-100"></span>
+            <span class="color-info-200"></span>
+            <span class="color-info-300"></span>
+            <span class="color-info-400"></span>
+            <span class="color-info-500"></span>
+            <span class="color-info-600"></span>
+            <span class="color-info-700"></span>
+            <span class="color-info-800"></span>
+            <span class="color-info-900"></span>
+            <span class="color-danger-50"></span>
+            <span class="color-danger-100"></span>
+            <span class="color-danger-200"></span>
+            <span class="color-danger-300"></span>
+            <span class="color-danger-400"></span>
+            <span class="color-danger-500"></span>
+            <span class="color-danger-600"></span>
+            <span class="color-danger-700"></span>
+            <span class="color-danger-800"></span>
+            <span class="color-danger-900"></span>
+            <span class="color-warning-50"></span>
+            <span class="color-warning-100"></span>
+            <span class="color-warning-200"></span>
+            <span class="color-warning-300"></span>
+            <span class="color-warning-400"></span>
+            <span class="color-warning-500"></span>
+            <span class="color-warning-600"></span>
+            <span class="color-warning-700"></span>
+            <span class="color-warning-800"></span>
+            <span class="color-warning-900"></span>
+            <span class="color-success-50"></span>
+            <span class="color-success-100"></span>
+            <span class="color-success-200"></span>
+            <span class="color-success-300"></span>
+            <span class="color-success-400"></span>
+            <span class="color-success-500"></span>
+            <span class="color-success-600"></span>
+            <span class="color-success-700"></span>
+            <span class="color-success-800"></span>
+            <span class="color-success-900"></span>
+            <span class="color-fusion-50"></span>
+            <span class="color-fusion-100"></span>
+            <span class="color-fusion-200"></span>
+            <span class="color-fusion-300"></span>
+            <span class="color-fusion-400"></span>
+            <span class="color-fusion-500"></span>
+            <span class="color-fusion-600"></span>
+            <span class="color-fusion-700"></span>
+            <span class="color-fusion-800"></span>
+            <span class="color-fusion-900"></span>
+        </p>
+        <script src="{{ url_for('static', filename='js/vendors.bundle.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/app.bundle.js')}}"></script>
+        <script>
+
+            $(function() {
+                // setTimeout() function will be fired after page is loaded
+                // it will wait for 5 sec. and then will fire
+                // $("#successMessage").hide() function
+                setTimeout(function() {
+                    $(".flash-alert").hide(1500)
+                }, 10000);
+            });
+
+            $("#js-login-btn").click(function(event)
+            {
+                var form = $("#js-login")
+
+                if (form[0].checkValidity() === false)
+                {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+
+                form.addClass('was-validated');
+            });
+
+
+            $(document).ready(function () {
+                $('.show-password-icon').click(function() {
+                    var passwordField = $(this).prev('.password-input');
+                    var passwordFieldType = passwordField.attr('type');
+                    console.log("I am here")
+                    console.log("passwordFieldType =====>>>> ", passwordFieldType)
+                    if (passwordFieldType === 'password') {
+                        passwordField.attr('type', 'text');
+                        $(this).removeClass('fa-eye').addClass('fa-eye-slash');
+                    } else {
+                        passwordField.attr('type', 'password');
+                        $(this).removeClass('fa-eye-slash').addClass('fa-eye');
+                    }
+                });
+
+                $(document).on('focusout', '.password-field', function() {
+                    var password = $(this).val();
+                    var validationResult = validatePassword(password);
+                    if (!validationResult.valid) {
+                        $(this).nextAll('.password-error').html(validationResult.message);
+                    } else {
+                        $(this).nextAll('.password-error').html('');
+                    }
+                });
+
+                function validatePassword(password) {
+                    // Implement password validation logic
+                    if (password.length < 8 || password.length > 20) {
+                        return { valid: false, message: 'Password must be 8-20 characters long.' };
+                    }
+                    if (!/[A-Z]/.test(password)) {
+                        return { valid: false, message: 'Password must contain at least one uppercase letter.' };
+                    }
+                    if (!/[a-z]/.test(password)) {
+                        return { valid: false, message: 'Password must contain at least one lowercase letter.' };
+                    }
+                    if (!/[\W_]/.test(password)) {
+                        return { valid: false, message: 'Password must contain at least one special character.' };
+                    }
+                    return { valid: true };
+                }
+
+            });
+
+        </script>
+    </body>
+</html>
