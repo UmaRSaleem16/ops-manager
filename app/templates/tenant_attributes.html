@@ -1,0 +1,264 @@
+
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div id="ta-panel-1" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        Tenants Attribute Types
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-target="#add-tenant-at"
+                                class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="modal" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-plus"></i>
+                        </button>
+                        <button data-action="panel-collapse" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <!-- <button data-target="#example-modal-centered-transparent_info" data-toggle="modal"
+                                data-offset="0,10" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-original-title="Info"><i class="fal fa-info"></i>
+                        </button> -->
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <!-- datatable start -->
+                        <table id="ta-dt-basic-example" class="table table-bordered table-hover table-striped w-100 attr-dt-basic">
+                            <thead class="bg-primary-700">
+                            <tr>
+                                <th>Name</th>
+                                <th>Limit</th>
+                                <th>Control</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for ta in tenant_attributes %}
+                                <tr>
+                                    <td>
+                                        {{ ta.name }}
+                                    </td>
+                                    <td>
+                                        {{ ta.limit }}
+                                    </td>
+                                    <td>
+                                        <div class="row float-right mr-1">
+                                            <form class="mr-1">
+                                                <input type="hidden" id="ta_id_{{ ta.id }}" name="ta_id_{{ ta.id }}" value="{{ ta.id }}" />
+                                                <input type="hidden" id="ta_nane_{{ ta.id }}" name="ta_name_{{ ta.id }}" value="{{ ta.name }}" />
+                                                <button class="btn btn-outline-primary btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" data-toggle="modal" data-target="#ta_default-example-modal-lg-center_{{ ta.id }}">
+                                                    <i class="fal fa-pencil">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                            <form class="mr-1">
+                                                <button class="btn btn-outline-danger btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" onclick="deleteTenantAttributeType('{{ ta.id }}','{{ta.name}}')">
+                                                    <i class="fal fa-trash">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Name</th>
+                                <th>Limit</th>
+                                <th>Control</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <!-- datatable end -->
+                    </div>
+                </div>
+            </div>
+            <!-- Edit Tenant Attribute -->
+            {% for ta in tenant_attributes %}
+            <div class="modal fade" id="ta_default-example-modal-lg-center_{{ ta.id }}" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <legend class="border-bottom mb-2 text-primary">Edit Attribute <mark><strong>{{ta.name}}</strong></mark></legend>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <form>
+                            <div class="modal-body">
+                                <div class="content-section">
+                                    <fieldset class="form-group">
+                                        <input class="form-control form-control-lg" id="ta_edit_id_{{ ta.id }}" name="ta_edit_id_{{ ta.id }}" required type="hidden" value="{{ ta.id }}">
+                                        <div class="form-group">
+                                            <h5 class="frame-heading mb-2">Attribute Name</h5>
+                                            <input class="form-control form-control-lg" id="ta_name_{{ ta.id }}" name="ta_name_{{ ta.id }}" value='{{ ta.name if ta.name else ""}}'>
+                                        </div>
+                                        <div class="form-group">
+                                            <h5 class="frame-heading mb-2">Limit</h5>
+                                            <input class="form-control form-control-lg" id="ta_limit_{{ ta.id }}" required name="ta_limit_{{ ta.id }}" value='{{ ta.limit if ta.limit else ""}}'>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-primary btn-lg mt-3" onclick="editTenantAttribute('{{ ta.id }}', '{{ta.name}}')">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <!-- Add Tenant Form -->
+            <div class="modal fade example-modal-centered-transparent_info" id="add-tenant-at"
+                 tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title ">
+                                Add Tenant Attribute Type
+                            </h4>
+                            <button type="button" class="close text-black-50" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="">
+                                <div class="">
+                                    <div class="" id="ta-v-pills-tabContent">
+                                        <div class="tab-pane fade show active" id="ta-v-pills-home" role="tabpanel"
+                                             aria-labelledby="v-pills-home-tab">
+                                            <form id="ta-js-login" novalidate="" method="POST" action="">
+                                                {{ tenant_form.hidden_tag() }}
+                                                {{ tenant_form.attribute_type }}
+                                                <div class="form-group">
+                                                    {{ tenant_form.name.label(class="form-label", placeholder="name", autocomplete="off") }}
+                                                    {% if tenant_form.name.errors %}
+                                                        {{ tenant_form.name(class="form-control", placeholder="name", autocomplete="off") }}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in tenant_form.name.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ tenant_form.name(class="form-control", placeholder="name", autocomplete="off") }}
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ tenant_form.limit.label(class="form-label", placeholder="limit", autocomplete="off") }}
+                                                    {% if tenant_form.limit.errors %}
+                                                        {{ tenant_form.service_id(class="form-control", placeholder="limit", autocomplete="off") }}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in tenant_form.limit.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ tenant_form.limit(class="form-control", placeholder="limit", autocomplete="off") }}
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="row no-gutters">
+                                                    <div class="col-md-4 ml-auto text-right">
+                                                        <button type="submit" class="btn btn-primary btn-lg mt-3">
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade" id="ta-v-pills-profile" role="tabpanel"
+                                             aria-labelledby="v-pills-profile-tab">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        {% raw %}
+
+        async function editTenantAttribute(attribute_id) {
+                
+                var limit = document.getElementById('ta_limit_' + attribute_id).value;
+                var attribute_name = document.getElementById('ta_name_' + attribute_id).value;
+
+                response = await fetch('/edit-tenant-attribute-type', 
+                {
+                    headers: {"Content-Type": "application/json" },
+                    method: 'POST',
+                    body: JSON.stringify({'attribute_id': attribute_id, 'attribute_name': attribute_name, 'limit': limit})
+                });
+                
+                result = await response.json()
+                if(result.success){
+                    window.location.reload();
+                    // toastr.success("Tenant edited successfully");
+                }
+                else{
+                    console.error(`Error occurred while deleting: ${result.error}`)
+                    toastr.warning("Error while editing tenant attribute")
+                }
+            }
+
+        async function deleteTenantAttributeType(id, name) {
+            var swalWithBootstrapButtons = Swal.mixin(
+            {
+                customClass:
+                {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-danger mr-2"
+                },
+                buttonsStyling: false
+            });
+
+            result = await swalWithBootstrapButtons.fire(
+            {
+                title: "Are you sure?",
+                html: `You are deleting <mark><strong>${name}</strong></mark>, You won't be able to revert this!`,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+                reverseButtons: true
+            });
+            if(result.value){
+                try{
+                    del_response = await fetch('/delete_tenant_attribute_type/' + id, {method: 'DELETE'})
+                    response = await del_response.json()
+                    if(response.success){
+                        await swalWithBootstrapButtons.fire("Deleted!",`Tenant Attribute <mark><strong>${name}</strong></mark> has been deleted.`,"success");
+                        window.location.reload();
+                    }else{
+                        console.error("Error occurred while deleting.")
+                        toastr.warning(response.error)
+                    }
+                }
+                catch(e){
+                    console.error(e);
+                    toastr.warning(`Exception: ${e.message}`);
+                }   
+            }
+            else{
+                swalWithBootstrapButtons.fire("Cancelled",`Deletion of tenant Attribute <mark><strong>${name}</strong></mark> is cancelled, you are safe :)`,"error");
+            }
+                
+        }
+        {% endraw %}
+        
+
+    </script>

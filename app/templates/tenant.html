@@ -1,0 +1,899 @@
+{% extends "layout.html" %}
+{% block link %}
+    <link rel="stylesheet" media="screen, print"
+          href="{{ url_for('static', filename='css/datagrid/datatables/datatables.bundle.css') }}">
+    <link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/fa-solid.css') }}">
+    <!-- <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
+          rel="stylesheet"> -->
+{% endblock link %}
+
+{% block pageheader %}
+    <!-- the #js-page-content id is needed for some plugins to initialize -->
+    <main id="js-page-content" role="main" class="page-content">
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('tenants.all_tenants') }}">Tenants</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">{{tenant.name}}</a></li>
+        <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
+    </ol>
+    <div class="subheader row">
+        <h1 class="subheader-title">
+            {{tenant.name}}
+        </h1>
+        <div class="tenat-is-sftp mr-5">
+            <div class="label">
+                <h3>Is SFTP</h3>
+            </div>
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-default btn-sm">
+                    {% if tenant.is_sftp > 0 %}
+                        <input type="radio" name="sfpt_options" id="sftP_option1" checked="checked"
+                                onclick="setIsSFTP('{{ tenant.is_sftp }}', '1','{{ tenant.id }}','{{ tenant.name }}')">
+                        True
+                    {% else %}
+                        <input type="radio" name="sfpt_options" id="sftP_option1"
+                                onclick="setIsSFTP('{{ tenant.is_sftp }}', '1','{{ tenant.id }}','{{ tenant.name }}')">
+                        True
+                    {% endif %}
+                </label>
+                <label class="btn btn-default btn-sm">
+                    {% if tenant.is_sftp > 0 %}
+                        <input type="radio" name="sfpt_options" id="sftP_option2"
+                                onclick="setIsSFTP('{{ tenant.is_sftp }}', '0','{{ tenant.id }}','{{ tenant.name }}')">
+                        False
+                    {% else %}
+                        <input type="radio" name="sfpt_options" id="sftP_option2" checked="checked"
+                                onclick="setIsSFTP('{{ tenant.is_sftp }}', '0','{{ tenant.id }}','{{ tenant.name }}')">
+                        False
+                    {% endif %}
+                </label>
+            </div>
+        </div>
+        <div class="tenat-active mr-5">
+            <div class="label">
+                <h3>Is Active</h3>
+            </div>
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                <label class="btn btn-default btn-sm">
+                    {% if tenant.is_disabled == 0 %}
+                        <input type="radio" name="options" id="option1" checked="checked"
+                                onclick="setIsDisable('{{ tenant.is_disabled }}', '0','{{ tenant.id }}','{{ tenant.name }}')">
+                        True
+                    {% else %}
+                        <input type="radio" name="options" id="option1"
+                                onclick="setIsDisable('{{ tenant.is_disabled }}', '0','{{ tenant.id }}','{{ tenant.name }}')">
+                        True
+                    {% endif %}
+                </label>
+                <label class="btn btn-default btn-sm">
+                    {% if tenant.is_disabled == 0 %}
+                        <input type="radio" name="options" id="option2"
+                                onclick="setIsDisable('{{ tenant.is_disabled }}', '1','{{ tenant.id }}','{{ tenant.name }}')">
+                        False
+                    {% else %}
+                        <input type="radio" name="options" id="option2" checked="checked"
+                                onclick="setIsDisable('{{ tenant.is_disabled }}', '1','{{ tenant.id }}','{{ tenant.name }}')">
+                        False
+                    {% endif %}
+                </label>
+            </div>
+        </div>
+        
+    </div>
+{% endblock pageheader %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        Tenant Information
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-action="panel-collapse" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <button data-target="#example-modal-centered-transparent_info" data-toggle="modal"
+                                data-offset="0,10" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-original-title="Info"><i class="fal fa-info"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <!-- datatable start -->
+                        <table id="dt-basic-example" class="table table-bordered table-hover table-striped w-100 my-datatable">
+                            <thead class="bg-primary-700">
+                            <tr>
+                                <th>Service ID</th>
+                                <th>Linux Username</th>
+                                <th>Linux User ID</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    {{ tenant.service_id }}
+                                </td>
+                                <td>
+                                    <a href="#">{{ tenant.linux_username }}</a>
+                                </td>
+                                <td>
+                                    <a href="#">{{ tenant.linux_uid }}</a>
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Service ID</th>
+                                <th>Linux Username</th>
+                                <th>Linux User ID</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <!-- datatable end -->
+                    </div>
+                </div>
+            </div>
+            <!--- SSH Attributes -->
+            <div id="panel-2" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        Tenant SSH KEY
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-target="#add-tenant-attribute-value"
+                                class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="modal" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-plus"></i>
+                        </button>
+                        <button data-action="panel-collapse" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <button data-target="#example-modal-centered-transparent_info" data-toggle="modal"
+                                data-offset="0,10" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-original-title="Info"><i class="fal fa-info"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <!-- datatable start -->
+                        <table id="dt-basic-example-2" class="table table-bordered table-hover table-striped w-100 my-datatable">
+                            <thead class="bg-primary-700">
+                            <tr>
+                                <th>Value</th>
+                                <th>Control</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if ssh_attributes %}
+                            {% for ta in ssh_attributes %}
+                                <tr>
+                                    <td>{{ ta.value | truncate(150, True, end='...') }}</td>
+                                    <td>
+                                        <div class="row float-right mr-1">
+                                            <form class="mr-1">
+                                                <input type="hidden" id="id_{{ ta.id }}" name="id_{{ ta.id }}" value="{{ ta.id }}" />
+                                                <button class="btn btn-outline-primary btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" data-toggle="modal" data-target="#tenant-attribute-modal-lg-center_{{ ta.id }}">
+                                                    <i class="fal fa-pencil">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                            <form class="mr-1">
+                                                <button class="btn btn-outline-danger btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" onclick="deleteTenantAttribute('{{ ta.id }}')">
+                                                    <i class="fal fa-trash">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% endif %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Value</th>
+                                <th>Control</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <!-- datatable end -->
+                    </div>
+                </div>
+            </div>
+            
+            <div id="panel-3" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        Other Tenant Attributes
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-target="#add-other-tenant-attribute-value"
+                                class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="modal" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-plus"></i>
+                        </button>
+                        <button data-action="panel-collapse" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <button data-target="#example-modal-centered-transparent_info" data-toggle="modal"
+                                data-offset="0,10" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-original-title="Info"><i class="fal fa-info"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <!-- datatable start -->
+                        <table id="dt-basic-example-3" class="table table-bordered table-hover table-striped w-100 my-datatable">
+                            <thead class="bg-primary-700">
+                            <tr>
+                                <th>Attribute Name</th>
+                                <th>Value</th>
+                                <th>Control</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if other_attributes %}
+                            {% for ta in other_attributes %}
+                                <tr>
+                                    <td>{{ ta.attribute_name }}</td>
+                                    <td>{{ ta.value | truncate(100, True, end='...') }}</td>
+                                    <td>
+                                        <div class="row float-right mr-1">
+                                            <form class="mr-1">
+                                                <input type="hidden" id="id_{{ ta.id }}" name="id_{{ ta.id }}" value="{{ ta.id }}" />
+                                                <button class="btn btn-outline-primary btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" data-toggle="modal" data-target="#tenant-attribute-modal-lg-center_{{ ta.id }}">
+                                                    <i class="fal fa-pencil">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                            <form class="mr-1">
+                                                <button class="btn btn-outline-danger btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" onclick="deleteTenantAttribute('{{ ta.id }}')">
+                                                    <i class="fal fa-trash">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% endif %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Attribute Name</th>
+                                <th>Value</th>
+                                <th>Control</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <!-- datatable end -->
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Edit other Attribute -->
+            {% for oa in other_attributes %}
+            <div class="modal fade" id="tenant-attribute-modal-lg-center_{{oa.id}}" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <legend class="border-bottom mb-2 text-primary">Edit <mark><strong>{{oa.attribute_name}}</strong></mark> Value</legend>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <form>
+                            <div class="modal-body">
+                                <div class="content-section">
+                                    <fieldset class="form-group">
+                                        <input class="form-control form-control-lg" id="edit_id_{{ oa.id }}" name="edit_id_{{ oa.id }}" required type="hidden" value="{{ oa.id }}">
+                                        <div class="form-group">
+                                            <h5 class="frame-heading mb-2">Attribute Value</h5>
+                                            <textarea class="form-control form-control-lg" id="value_{{ oa.id }}" name="value_{{ oa.id }}" rows="5">{{ oa.value if oa.value else ""}}</textarea>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-primary btn-lg mt-3" onclick="editTenantAttribute('{{ oa.id }}')">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Edit SSH Attribute -->
+            {% for ssh in ssh_attributes %}
+            <div class="modal fade" id="tenant-attribute-modal-lg-center_{{ssh.id}}" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <legend class="border-bottom mb-2 text-primary">Edit SSH Value</legend>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <form>
+                            <div class="modal-body">
+                                <div class="content-section">
+                                    <fieldset class="form-group">
+                                        <input class="form-control form-control-lg" id="edit_id_{{ ssh.id }}" name="edit_id_{{ ssh.id }}" required type="hidden" value="{{ ssh.id }}">
+                                        <div class="form-group">
+                                            <h5 class="frame-heading mb-2">Attribute Value</h5>
+                                            <textarea class="form-control form-control-lg" id="value_{{ ssh.id }}" name="value_{{ ssh.id }}" rows="5">{{ ssh.value if ssh.value else ""}}</textarea>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-primary btn-lg mt-3" onclick="editTenantAttribute('{{ ssh.id }}')">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- ADD SSH KEY -->
+            <div class="modal fade example-modal-centered-transparent_info" id="add-tenant-attribute-value"
+                 tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title ">
+                                Add SSH key
+                            </h4>
+                            <button type="button" class="close text-black-50" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="">
+                                <div class="">
+                                    <div class="" id="v-pills-tabContent">
+                                        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                                             aria-labelledby="v-pills-home-tab">
+                                            <form id="js-login-2" novalidate="" method="POST" action="">
+                                                {{ form.hidden_tag() }}
+                                                <div class="form-group">
+                                                    <input type="hidden" name="is_ssh_key" value="1" />
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ form.tenant_attribute_type.label(class="form-label", placeholder="Select tenant attribute type", autocomplete="off") }}
+                                                    {{ form.tenant_attribute_type(id="tat-1", class="form-control select-control", placeholder="Select tenant attribute type", autocomplete="off") }}
+                                                    {% if form.tenant_attribute_type.errors %}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in form.tenant_attribute_type.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ form.value.label(class="form-label", placeholder="value", autocomplete="off") }}
+                                                    {% if form.value.errors %}
+                                                        {{ form.value(class="form-control", placeholder="value", autocomplete="off") }}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in form.value.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ form.value(class="form-control", placeholder="value", autocomplete="off") }}
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="row no-gutters">
+                                                    <div class="col-md-4 ml-auto text-right">
+                                                        <button type="submit" class="btn btn-primary btn-lg mt-3">
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
+                                             aria-labelledby="v-pills-profile-tab">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+                <!-- ADD Other Attributes -->
+                <div class="modal fade example-modal-centered-transparent_info" id="add-other-tenant-attribute-value"
+                tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title ">
+                                Add Tenant Attribute
+                            </h4>
+                            <button type="button" class="close text-black-50" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="">
+                                <div class="">
+                                    <div class="" id="v-pills-tabContent">
+                                        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                                            aria-labelledby="v-pills-home-tab">
+                                            <form id="js-login" novalidate="" method="POST" action="">
+                                                {{ other_form.hidden_tag() }}
+                                                <div class="form-group">
+                                                    <input type="hidden" name="is_ssh_key" value="0" />
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ other_form.tenant_attribute_type.label(class="form-label", placeholder="Select tenant attribute type", autocomplete="off") }}
+                                                    {{ other_form.tenant_attribute_type(class="form-control select-control", placeholder="Select tenant attribute type", autocomplete="off") }}
+                                                    {% if other_form.tenant_attribute_type.errors %}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in other_form.tenant_attribute_type.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ other_form.value.label(class="form-label", placeholder="value", autocomplete="off") }}
+                                                    {% if other_form.value.errors %}
+                                                        {{ other_form.value(class="form-control", placeholder="value", autocomplete="off") }}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in other_form.value.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% else %}
+                                                        {{ other_form.value(class="form-control", placeholder="value", autocomplete="off") }}
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="row no-gutters">
+                                                    <div class="col-md-4 ml-auto text-right">
+                                                        <button type="submit" class="btn btn-primary btn-lg mt-3">
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
+                                            aria-labelledby="v-pills-profile-tab">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Info -->
+            <div class="modal fade example-modal-centered-transparent_info" id="example-modal-centered-transparent_info"
+                 tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title ">
+                                Tenants
+                                <small class="m-0 opacity-70">
+                                    A list of all enabled tenants for configured pods.
+                                </small>
+                            </h4>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-auto">
+                                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist"
+                                         aria-orientation="vertical">
+                                        <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill"
+                                           href="#v-pills-home" role="tab" aria-controls="v-pills-home"
+                                           aria-selected="true">
+                                            <i class="fal fa-money-bill-wave"></i>
+                                            <span class="hidden-sm-down ml-1">Tenants</span>
+                                        </a>
+                                        <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill"
+                                           href="#v-pills-profile" role="tab" aria-controls="v-pills-profile"
+                                           aria-selected="false">
+                                            <i class="fal fa-cog"></i>
+                                            <span class="hidden-sm-down ml-1">Configuration</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="tab-content" id="v-pills-tabContent">
+                                        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                                             aria-labelledby="v-pills-home-tab">
+                                            <h3>
+                                                <a href="https://wiki.fraudmap.net/confluence/display/development/XCEED+Fraud+Architecture#XCEEDFraudArchitecture-WhatisaTenant?"
+                                                   target="_blank">Tenants</a>
+                                            </h3>
+                                            <p> The financial institutions that send us event data are our "customers".
+                                                However, each customer can have different offerings, like wire, online
+                                                banking, ach etc. In our system, we call these "tenants".
+                                                <br><br>
+                                                For example, StarOne Credit Union is a customer and its different
+                                                offerings viz. retail, wire, achrdfi etc are the different tenants. Each
+                                                such tenant is allocated an id by us which is called a service id. A
+                                                service id is unique inside a pod.
+                                                In our system, a sample tenant name looks like this:
+                                                <br><br>
+                                                <font color="red">StarOneCUCA</font>-<font
+                                                        color="blue">Retail</font>_<font color="green">1777</font>
+                                                <br><br>
+                                                The part in red is called the host_name and the one in blue is called
+                                                the host_service. The green is the service_id at the end.
+                                                <br><br>
+                                                Each tenant has a tenant definition, which constitutes of the tenant
+                                                model and the tenant configuration.
+                                            </p>
+                                            <span class="fs-sm d-flex align-items-center mt-3 flex-wrap">
+                                                                </span>
+                                        </div>
+                                        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
+                                             aria-labelledby="v-pills-profile-tab">
+                                            <h3>
+                                                Configuration
+                                            </h3>
+                                            <p>
+                                                The tenants.pp files are how tenants show up here. The CommanderData
+                                                program needs to be configured to watch the desired pod. Any
+                                                tenants that are enabled will show up here and depending on the
+                                                components enabled for them, can be managed through this tool.
+                                            </p>
+                                            <p>
+                                                Enabled tenant pp example:
+                                                <br>
+                                                fraudmap4::pod::tenant { "$pod_name:HostName-HostService_ServiceID":
+                                                <br><br>
+                                                The CommanderData program is extremely picky about this line. If you
+                                                mess it up, your tenant could not show up.
+                                            </p>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <!--
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                            -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/datagrid/datatables/datatables.bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/datagrid/datatables/datatables.export.js') }}"></script>
+    <script>
+        {% raw %}
+
+        async function setIsSFTP(current_status, new_status, id, name) {
+
+            if (current_status != new_status) {
+                var swalWithBootstrapButtons = Swal.mixin(
+                    {
+                        customClass:
+                            {
+                                confirmButton: "btn btn-primary",
+                                cancelButton: "btn btn-danger mr-2"
+                            },
+                        buttonsStyling: false
+                    });
+
+                result = await swalWithBootstrapButtons.fire(
+                    {
+                        title: "Are you sure?",
+                        html: `You are about to update Tenant <strong><mark>${name}</mark></strong> SFTP status!`,
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, update!",
+                        cancelButtonText: "No, cancel!",
+                        reverseButtons: true
+                    });
+                if (result.value) {
+                    try {
+                        response = await fetch('/tenant-set-is-sftp/'+id,
+                            {
+                                headers: {"Content-Type": "application/json"},
+                                method: 'POST',
+                                body: JSON.stringify({'is_sftp': new_status})
+                            });
+
+                        result = await response.json()
+                        if (result.success) {
+                            window.location.reload()
+                            // toastr.success("user edited successfully");
+                        } else {
+                            if (current_status > 0) {
+                                $("#option1").prop("checked", true).trigger("click");
+                            } else {
+                                $("#option2").prop("checked", true).trigger("click");
+                            }
+                            console.error(`Error occurred updating group. ${result.error}`)
+                            toastr.warning(result.error ? result.error : "Error while updating Group.")
+                        }
+                    } catch (e) {
+                        if (current_status > 0) {
+                            $("#option1").prop("checked", true).trigger("click");
+                        } else {
+                            $("#option2").prop("checked", true).trigger("click");
+                        }
+                        console.error(e);
+                        toastr.warning(`Exception: ${e.message}`);
+                    }
+                } else {
+
+                    if (current_status > 0) {
+                        $("#option1").prop("checked", true).trigger("click");
+                    } else {
+                        $("#option2").prop("checked", true).trigger("click");
+                    }
+                    swalWithBootstrapButtons.fire("Cancelled", `Update of tenant is_disable is cancelled, you are safe :)`, "error");
+                }
+            }
+        }
+
+
+        async function setIsDisable(current_status, new_status, id, name) {
+
+            if (current_status != new_status) {
+                var swalWithBootstrapButtons = Swal.mixin(
+                    {
+                        customClass:
+                            {
+                                confirmButton: "btn btn-primary",
+                                cancelButton: "btn btn-danger mr-2"
+                            },
+                        buttonsStyling: false
+                    });
+
+                result = await swalWithBootstrapButtons.fire(
+                    {
+                        title: "Are you sure?",
+                        html: `You are about to update Tenant <strong><mark>${name}</mark></strong> active status!`,
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Yes, update!",
+                        cancelButtonText: "No, cancel!",
+                        reverseButtons: true
+                    });
+                if (result.value) {
+                    try {
+                        response = await fetch('/tenant-set-is-disable',
+                            {
+                                headers: {"Content-Type": "application/json"},
+                                method: 'POST',
+                                body: JSON.stringify({'id': id, 'is_disable': new_status})
+                            });
+
+                        result = await response.json()
+                        if (result.success) {
+                            window.location.reload()
+                            // toastr.success("user edited successfully");
+                        } else {
+                            if (current_status > 0) {
+                                $("#option1").prop("checked", true).trigger("click");
+                            } else {
+                                $("#option2").prop("checked", true).trigger("click");
+                            }
+                            console.error(`Error occurred updating group. ${result.error}`)
+                            toastr.warning(result.error ? result.error : "Error while updating Group.")
+                        }
+                    } catch (e) {
+                        if (current_status > 0) {
+                            $("#option1").prop("checked", true).trigger("click");
+                        } else {
+                            $("#option2").prop("checked", true).trigger("click");
+                        }
+                        console.error(e);
+                        toastr.warning(`Exception: ${e.message}`);
+                    }
+                } else {
+
+                    if (current_status > 0) {
+                        $("#option1").prop("checked", true).trigger("click");
+                    } else {
+                        $("#option2").prop("checked", true).trigger("click");
+                    }
+                    swalWithBootstrapButtons.fire("Cancelled", `Update of tenant is_disable is cancelled, you are safe :)`, "error");
+                }
+            }
+        }
+
+        /* Edit SSH Key */
+        async function editTenantAttribute(id) {
+            var value = document.getElementById('value_' + id).value;
+
+            response = await fetch('/edit-tenant-attribute', 
+            {
+                headers: {"Content-Type": "application/json" },
+                method: 'POST',
+                body: JSON.stringify({'id': id, 'value': value.toString() })
+            });
+            
+            result = await response.json()
+            if(result.success){
+                window.location.reload()
+                // toastr.success("user edited successfully");
+            }
+            else{
+                console.error(`Error occurred while editing. ${result.error}`)
+                toastr.warning(result.error ? result.error : "Error while editing SSH Attribute.")
+            }
+        }
+
+        /* Delete SSH Key */
+        async function deleteTenantAttribute(id) {
+            var swalWithBootstrapButtons = Swal.mixin(
+            {
+                customClass:
+                {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-danger mr-2"
+                },
+                buttonsStyling: false
+            });
+
+            result = await swalWithBootstrapButtons.fire(
+            {
+                title: "Are you sure?",
+                html: `You are deleting attribute, You won't be able to revert this!`,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+                reverseButtons: true
+            });
+            if(result.value){
+                try{
+                    del_response = await fetch('/delete-tenant-attribute/' + id, {method: 'DELETE',})
+                    response = await del_response.json()
+                    if (response.success) {
+                        await swalWithBootstrapButtons.fire("Deleted!",`Tenant Attribute has been deleted.`,"success");
+                        window.location.reload(); // Redirect to home or another appropriate page
+                    }
+                    else{
+                            console.error("Error occurred while deleting.")
+                            toastr.warning(response.error)
+                    }
+                }
+                catch(e){
+                    console.error(e);
+                    toastr.warning(`Exception: ${e.message}`);
+                }
+            }
+            else{
+                swalWithBootstrapButtons.fire("Cancelled",`Deletion of tenant attribute is cancelled, you are safe :)`,"error");
+            }
+        }
+        {% endraw %}
+
+
+        $(document).ready(function () {
+
+            // initialize datatable
+            $('.my-datatable').dataTable(
+                {
+                    responsive: true,
+                    lengthChange: true,
+                    language: {
+                        "lengthMenu": "_MENU_"
+                    },
+                    fixedHeader: true,
+                    dom:
+                    /*  --- Layout Structure
+                        --- Options
+                        l   -   length changing input control
+                        f   -   filtering input
+                        t   -   The table!
+                        i   -   Table information summary
+                        p   -   pagination control
+                        r   -   processing display element
+                        B   -   buttons
+                        R   -   ColReorder
+                        S   -   Select
+
+                        --- Markup
+                        < and >             - div element
+                        <"class" and >      - div with a class
+                        <"#id" and >        - div with an ID
+                        <"#id.class" and >  - div with an ID and a class
+
+                        --- Further reading
+                        https://datatables.net/reference/option/dom
+                        --------------------------------------
+                     */
+                        "<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'fl><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+                        "<'row'<'col-sm-12'tr>>" +
+                        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                    buttons: [
+                        // {
+                        //     extend:    'colvis',
+                        //     text:      'Column Visibility',
+                        //     titleAttr: 'Col visibility',
+                        //     className: 'mr-sm-3'
+                        // },
+                        {
+                            extend: 'pdfHtml5',
+                            text: 'PDF',
+                            titleAttr: 'Generate PDF',
+                            className: 'btn-outline-danger btn-sm mr-1'
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            text: 'Excel',
+                            titleAttr: 'Generate Excel',
+                            className: 'btn-outline-success btn-sm mr-1'
+                        },
+                        {
+                            extend: 'csvHtml5',
+                            text: 'CSV',
+                            titleAttr: 'Generate CSV',
+                            className: 'btn-outline-primary btn-sm mr-1'
+                        },
+                        {
+                            extend: 'copyHtml5',
+                            text: 'Copy',
+                            titleAttr: 'Copy to clipboard',
+                            className: 'btn-outline-primary btn-sm mr-1'
+                        },
+                        {
+                            extend: 'print',
+                            text: 'Print',
+                            titleAttr: 'Print Table',
+                            className: 'btn-outline-primary btn-sm'
+                        }
+                    ]
+                });
+
+        });
+
+    </script>
+    </main>
+{% endblock script %}

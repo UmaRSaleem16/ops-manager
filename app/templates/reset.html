@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+{% block link %}
+    <link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/fa-solid.css') }}">
+{% endblock link %}
+
+{% block pageheader %}
+    <!-- the #js-page-content id is needed for some plugins to initialize -->
+    <main id="js-page-content" role="main" class="page-content">
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ title | capitalize }}</li>
+        <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
+    </ol>
+    <div class="subheader">
+        <h1 class="subheader-title">
+            {{ title | capitalize }}
+        </h1>
+    </div>
+{% endblock pageheader %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-6 ml-auto mr-auto">
+            <div class="card p-4 rounded-plus bg-faded">
+                <form id="js-login" novalidate="" method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            {{ form.current_password.label(class="form-label", placeholder="Current password", autocomplete="off") }}
+                            {{ form.current_password(class="form-control password-input", placeholder="Current password", autocomplete="off") }}
+                            <i class="fal fa-eye show-password-icon"></i>
+                        </div>
+                        {% if form.current_password.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.current_password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="invalid-feedback">Sorry, you missed this one.</div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            {{ form.new_password.label(class="form-label") }}
+                            {{ form.new_password(class="form-control password-input", placeholder="new password") }}
+                            <i class="fal fa-eye show-password-icon"></i>
+                        </div>
+                        {% if form.new_password.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.new_password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="invalid-feedback">Sorry, you missed this one.</div>
+                        <div class="help-block">Your password must be 8-20 characters long, contain letters and numbers,
+                            and must not contain spaces, special characters, or emoji.
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            {{ form.confirm_password.label(class="form-label") }}
+                            {{ form.confirm_password(class="form-control password-input", placeholder="confirm password") }}
+                            <i class="fal fa-eye show-password-icon"></i>
+                        </div>
+                        {% if form.confirm_password.errors %}
+                            <div class="invalid-feedback">Error
+                                {% for error in form.confirm_password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>                            
+                        {% endif %}
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="col-md-4 ml-auto text-right">
+                            <button id="js-login-btn" type="submit" class="btn btn-primary btn-lg mt-3">Reset
+                                Password
+                            </button>
+                        </div>
+                    </div>
+                    <!-- <div class="row no-gutters">
+                        <a href="{{ url_for('users.forgot') }}" class="my2">Forgot Password?</a>
+                    </div> -->
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

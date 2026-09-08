@@ -1,0 +1,912 @@
+{% extends "layout.html" %}
+{% block link %}
+<link rel="stylesheet" media="screen, print"
+    href="{{ url_for('static', filename='css/datagrid/datatables/datatables.bundle.css') }}">
+<link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/fa-solid.css') }}">
+{% endblock link %}
+
+{% block pageheader %}
+<!-- the #js-page-content id is needed for some plugins to initialize -->
+<main id="js-page-content" role="main" class="page-content">
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('users.all_users') }}">users</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="#">{{user.name}}</a></li>
+        <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
+    </ol>
+    <div class="subheader">
+        <h1 class="subheader-title">
+            {{user.name}}
+        </h1>
+    </div>
+    {% endblock pageheader %}
+
+
+    {% block content %}
+    <div class="row">
+        <div class="col-xl-12">
+            
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        User Information
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-action="panel-collapse" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <button data-target="#example-modal-centered-transparent_info" data-toggle="modal"
+                                data-offset="0,10" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-original-title="Info"><i class="fal fa-info"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <!-- datatable start -->
+                        <table id="dt-basic-example" class="table table-bordered table-hover table-striped w-100 my-datatable">
+                            <thead class="bg-primary-700">
+                            <tr>
+                                <th>Username</th>
+                                <th>Title</th>
+                                <th>Name</th>
+                                <th>Linux User Id</th>
+                                <th>Department</th>
+                                <th>Security Group</th>
+                                <th>Control</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    {{ user.username }}
+                                </td>
+                                <td>
+                                    {{ user.title }}
+                                </td>
+                                <td>
+                                    {{ user.name }}
+                                </td>
+                                <td>
+                                    {% if user.linux_user_id %}
+                                    {{ user.linux_user_id }}
+                                    {% else %}
+                                        {{""}}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.department %}
+                                    {{ user.department }}
+                                    {% else %}
+                                        {{""}}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if group %}
+                                        {{ group.name }}
+                                    {% else %}
+                                        {{""}}
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="row float-right mr-1">
+                                        <form class="mr-1">
+                                            <input type="hidden" id="id_{{ user.id }}" name="id_{{ user.id }}" value="{{ user.id }}" />
+                                            <input type="hidden" id="username_{{ user.id }}" name="username_{{ user.id }}" value="{{ user.username }}" />
+                                            <button class="btn btn-outline-primary btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" data-toggle="modal" data-target="#default-example-modal-lg-center_{{ user.id }}">
+                                                <i class="fal fa-pencil">
+                                                </i>
+                                            </button>
+                                        </form>
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Username</th>
+                                <th>Title</th>
+                                <th>Name</th>
+                                <th>Linux User Id</th>
+                                <th>Department</th>
+                                <th>Security Group</th>
+                                <th>Control</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <!-- datatable end -->
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Modal User Edit -->
+            <div class="modal fade" id="default-example-modal-lg-center_{{ user.id }}" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <legend class="border-bottom mb-2 text-primary">Edit User <mark><strong>{{user.name}}</strong></mark></legend>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <form>
+                            <div class="modal-body">
+                                <div class="content-section">
+                                    <fieldset class="form-group">
+
+                                        <input class="form-control form-control-lg" id="edit_id_{{ user.id }}" name="edit_id_{{ user.id }}" required type="hidden" value="{{ user.id }}">
+
+                                        <div class="form-group">
+                                            
+                                            <h5 class="frame-heading mb-2">Linux User Id</h5>
+                                            <input class="form-control form-control-lg" id="linux_user_id_{{ user.id }}" name="linux_user_id_{{ user.id }}" value='{{ user.linux_user_id if user.linux_user_id else ""}}'>
+
+                                            <h5 class="frame-heading mb-2 mt-4">Department</h5>
+                                            <input class="form-control form-control-lg" id="department_{{ user.id }}" name="department__{{ user.id }}" value='{{ user.department if user.department else "" }}'>
+
+                                            <h5 class="frame-heading mb-2 mt-4">Groups</h5>
+                                            <select class="select-control form-control" name="group_selection_{{ user.id }}" id="group_selection_{{ user.id }}">
+                                                <option value="">-- Select Group --</option>
+                                                {% for gr in groups %}
+                                                    {% if gr.id == group.id %}
+                                                        <option value="{{ gr.id }}" selected="selected">{{ gr.name }}</option>
+                                                    {% else %}
+                                                        <option value="{{ gr.id }}">{{ gr.name }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-primary btn-lg mt-3" onclick="editUser({{ user.id }}, '{{user.name}}')">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!--- Custom Password Attributes -->
+            <div id="panel-2" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        Custom Passwords
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-target="#add-user-attribute-custom-password"
+                                class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="modal" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-plus"></i>
+                        </button>
+                        <button data-action="panel-collapse" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <button data-target="#example-modal-centered-transparent_info" data-toggle="modal"
+                                data-offset="0,10" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-original-title="Info"><i class="fal fa-info"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <!-- datatable start -->
+                        <table id="system-attribute-table" class="table table-bordered table-hover table-striped w-100 my-datatable">
+                            <thead class="bg-primary-700">
+                            <tr>
+                                <th>Name</th>
+                                <th>Value</th>
+                                <th>Control</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if system_attributes %}
+                            {% for sa in system_attributes %}
+                                <tr>
+                                    <td>{{ sa.attribute_name }}</td>
+                                    <td>{{ sa.value | truncate(150, True, end='...') }}</td>
+                                    <td>
+                                        <div class="row float-right mr-1">
+                                            <form class="mr-1">
+                                                <input type="hidden" id="id_{{ sa.id }}" name="id_{{ sa.id }}" value="{{ sa.id }}" />
+                                                <button class="btn btn-outline-primary btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" data-toggle="modal" data-target="#user-attribute-modal-lg-center_{{ sa.id }}">
+                                                    <i class="fal fa-pencil">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                            <form class="mr-1">
+                                                <button class="btn btn-outline-danger btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" onclick="deleteUserAttribute('{{ sa.id }}')">
+                                                    <i class="fal fa-trash">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% endif %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Name</th>
+                                <th>Value</th>
+                                <th>Control</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <!-- datatable end -->
+                    </div>
+                </div>
+            </div>
+
+
+            <!--- SSH Attribute  -->
+            <div id="panel-3" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        SSH Attributes
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-target="#add-user-attribute-ssh-key"
+                                class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="modal" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-plus"></i>
+                        </button>
+                        <button data-action="panel-collapse" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <button data-target="#example-modal-centered-transparent_info" data-toggle="modal"
+                                data-offset="0,10" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-original-title="Info"><i class="fal fa-info"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <!-- datatable start -->
+                        <table id="other-attribute-table" class="table table-bordered table-hover table-striped w-100 my-datatable">
+                            <thead class="bg-primary-700">
+                            <tr>
+                                <th>Name</th>
+                                <th>Value</th>
+                                <th>Control</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if ssh_attribute %}
+                            {% for oa in ssh_attribute %}
+                                <tr>
+                                    <td>{{ oa.attribute_name }}</td>
+                                    <td>{{ oa.value | truncate(150, True, end='...') }}</td>
+                                    <td>
+                                        <div class="row float-right mr-1">
+                                            <form class="mr-1">
+                                                <input type="hidden" id="id_{{ oa.id }}" name="id_{{ oa.id }}" value="{{ oa.id }}" />
+                                                <button class="btn btn-outline-primary btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" data-toggle="modal" data-target="#user-attribute-modal-lg-center_{{ oa.id }}">
+                                                    <i class="fal fa-pencil">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                            <form class="mr-1">
+                                                <button class="btn btn-outline-danger btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" onclick="deleteUserAttribute('{{ oa.id }}')">
+                                                    <i class="fal fa-trash">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% endif %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Name</th>
+                                <th>Value</th>
+                                <th>Control</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <!-- datatable end -->
+                    </div>
+                </div>
+            </div>
+
+            
+            <!--- Other user Attributes -->
+            <div id="panel-3" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        Other Attributes
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-target="#add-user-attribute-other"
+                                class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="modal" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-plus"></i>
+                        </button>
+                        <button data-action="panel-collapse" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <button data-target="#example-modal-centered-transparent_info" data-toggle="modal"
+                                data-offset="0,10" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-original-title="Info"><i class="fal fa-info"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <!-- datatable start -->
+                        <table id="other-attribute-table" class="table table-bordered table-hover table-striped w-100 my-datatable">
+                            <thead class="bg-primary-700">
+                            <tr>
+                                <th>Name</th>
+                                <th>Value</th>
+                                <th>Control</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if other_attributes %}
+                            {% for oa in other_attributes %}
+                                <tr>
+                                    <td>{{ oa.attribute_name }}</td>
+                                    <td>{{ oa.value | truncate(150, True, end='...') }}</td>
+                                    <td>
+                                        <div class="row float-right mr-1">
+                                            <form class="mr-1">
+                                                <input type="hidden" id="id_{{ oa.id }}" name="id_{{ oa.id }}" value="{{ oa.id }}" />
+                                                <button class="btn btn-outline-primary btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" data-toggle="modal" data-target="#user-attribute-modal-lg-center_{{ oa.id }}">
+                                                    <i class="fal fa-pencil">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                            <form class="mr-1">
+                                                <button class="btn btn-outline-danger btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" onclick="deleteUserAttribute('{{ oa.id }}')">
+                                                    <i class="fal fa-trash">
+                                                    </i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% endif %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>Name</th>
+                                <th>Value</th>
+                                <th>Control</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <!-- datatable end -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Other User Attributes -->
+            {% for oa in other_attributes %}
+            <div class="modal fade" id="user-attribute-modal-lg-center_{{oa.id}}" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <legend class="border-bottom mb-2 text-primary">Edit <mark><strong>{{oa.attribute_name}}</strong></mark> Value</legend>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <form>
+                            <div class="modal-body">
+                                <div class="content-section">
+                                    <fieldset class="form-group">
+                                        <input class="form-control form-control-lg" id="edit_id_{{ oa.id }}" name="edit_id_{{ oa.id }}" required type="hidden" value="{{ oa.id }}">
+                                        <div class="form-group">
+                                            <h5 class="frame-heading mb-2">Attribute Value</h5>
+                                            <textarea class="form-control form-control-lg" id="value_{{ oa.id }}" name="value_{{ oa.id }}" rows="5">{{ oa.value if oa.value else ""}}</textarea>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-primary btn-lg mt-3" onclick="editUserAttribute('{{ oa.id }}')">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Edit user System Attributes -->
+            {% for sa in system_attributes %}
+            <div class="modal fade" id="user-attribute-modal-lg-center_{{sa.id}}" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <legend class="border-bottom mb-2 text-primary">Edit <mark><strong>{{sa.attribute_name}}</strong></mark> Value</legend>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <form>
+                            <div class="modal-body">
+                                <div class="content-section">
+                                    <fieldset class="form-group">
+                                        <input class="form-control form-control-lg" id="edit_id_{{ sa.id }}" name="edit_id_{{ sa.id }}" required type="hidden" value="{{ sa.id }}">
+                                        <div class="form-group">
+                                            <h5 class="frame-heading mb-2">Attribute Value</h5>
+                                            <textarea class="form-control form-control-lg" id="value_{{ sa.id }}" name="value_{{ sa.id }}" rows="5">{{ sa.value if sa.value else ""}}</textarea>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-primary btn-lg mt-3" onclick="editUserAttribute('{{ sa.id }}')">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Edit user SSH Attributes -->
+            {% for sa in ssh_attribute %}
+            <div class="modal fade" id="user-attribute-modal-lg-center_{{sa.id}}" tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <legend class="border-bottom mb-2 text-primary">Edit <mark><strong>{{sa.attribute_name}}</strong></mark> Value</legend>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <form>
+                            <div class="modal-body">
+                                <div class="content-section">
+                                    <fieldset class="form-group">
+                                        <input class="form-control form-control-lg" id="edit_id_{{ sa.id }}" name="edit_id_{{ sa.id }}" required type="hidden" value="{{ sa.id }}">
+                                        <div class="form-group">
+                                            <h5 class="frame-heading mb-2">Attribute Value</h5>
+                                            <textarea class="form-control form-control-lg" id="value_{{ sa.id }}" name="value_{{ sa.id }}" rows="5">{{ sa.value if sa.value else ""}}</textarea>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-primary btn-lg mt-3" onclick="editUserAttribute('{{ sa.id }}')">Submit</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- ADD custom password Attribute -->
+            <div class="modal fade example-modal-centered-transparent_info" id="add-user-attribute-custom-password"
+                 tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title ">
+                                Add Password
+                            </h4>
+                            <button type="button" class="close text-black-50" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="">
+                                <div class="">
+                                    <div class="" id="v-pills-tabContent">
+                                        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                                             aria-labelledby="v-pills-home-tab">
+                                            <form id="js-login" novalidate="" method="POST" action="/add-user-attribute">
+                                                {{ custom_password_form.hidden_tag() }}
+                                                <input type="hidden" name="user_id" value="{{user.id}}"/>
+                                                <input type="hidden" name="username" value="{{user.username}}"/>
+                                                <div class="form-group">
+                                                    <input type="hidden" name="is_ssh_key" value="1" />
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ custom_password_form.user_attributes.label(class="form-label") }}
+                                                    {{ custom_password_form.user_attributes(id="user-custom-pass-select", class="form-control select-control", placeholder="Select attribute type", autocomplete="off") }}
+                                                    {% if custom_password_form.user_attributes.errors %}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in custom_password_form.user_attributes.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ custom_password_form.attribute_value.label(class="form-label") }}
+                                                    {{ custom_password_form.attribute_value(class="form-control", placeholder="value", autocomplete="off") }}
+                                                    {% if custom_password_form.attribute_value.errors %}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in custom_password_form.attribute_value.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="row no-gutters">
+                                                    <div class="col-md-4 ml-auto text-right">
+                                                        <button type="submit" class="btn btn-primary btn-lg mt-3">
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
+                                             aria-labelledby="v-pills-profile-tab">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ADD SSH Key Attribute -->
+            <div class="modal fade example-modal-centered-transparent_info" id="add-user-attribute-ssh-key"
+            tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+               <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                   <div class="modal-content">
+                       <div class="modal-header">
+                           <h4 class="modal-title ">
+                               Add SSH key
+                           </h4>
+                           <button type="button" class="close text-black-50" data-dismiss="modal" aria-label="Close">
+                               <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                           </button>
+                       </div>
+                       <div class="modal-body">
+                           <div class="">
+                               <div class="">
+                                   <div class="" id="v-pills-tabContent">
+                                       <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                                           aria-labelledby="v-pills-home-tab">
+                                           <form id="js-login" novalidate="" method="POST" action="/add-user-attribute">
+                                               {{ ssh_key_form.hidden_tag() }}
+                                               <input type="hidden" name="user_id" value="{{user.id}}"/>
+                                               <input type="hidden" name="username" value="{{user.username}}"/>
+                                               <div class="form-group">
+                                                   <input type="hidden" name="is_ssh_key" value="1" />
+                                               </div>
+                                               <div class="form-group">
+                                                   {{ ssh_key_form.user_attributes.label(class="form-label") }}
+                                                   {{ ssh_key_form.user_attributes(id="user-ssh-select", class="form-control select-control", placeholder="Select attribute type", autocomplete="off") }}
+                                                   {% if ssh_key_form.user_attributes.errors %}
+                                                       <div class="invalid-feedback">
+                                                           {% for error in ssh_key_form.user_attributes.errors %}
+                                                               <span>{{ error }}</span>
+                                                           {% endfor %}
+                                                       </div>
+                                                   {% endif %}
+                                                   <div class="invalid-feedback">No, you missed this one.</div>
+                                               </div>
+                                               <div class="form-group">
+                                                   {{ ssh_key_form.attribute_value.label(class="form-label") }}
+                                                   {{ ssh_key_form.attribute_value(class="form-control", placeholder="value", autocomplete="off") }}
+                                                   {% if ssh_key_form.attribute_value.errors %}
+                                                       <div class="invalid-feedback">
+                                                           {% for error in ssh_key_form.attribute_value.errors %}
+                                                               <span>{{ error }}</span>
+                                                           {% endfor %}
+                                                       </div>
+                                                   {% endif %}
+                                                   <div class="invalid-feedback">No, you missed this one.</div>
+                                               </div>
+                                               <div class="row no-gutters">
+                                                   <div class="col-md-4 ml-auto text-right">
+                                                       <button type="submit" class="btn btn-primary btn-lg mt-3">
+                                                           Submit
+                                                       </button>
+                                                   </div>
+                                               </div>
+                                           </form>
+                                       </div>
+                                       <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
+                                           aria-labelledby="v-pills-profile-tab">
+                                       </div>
+                                   </div>
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+
+             <!-- ADD Other User Attribute -->
+             <div class="modal fade example-modal-centered-transparent_info" id="add-user-attribute-other"
+             tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title ">
+                                Add Other Attributes
+                            </h4>
+                            <button type="button" class="close text-black-50" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="">
+                                <div class="">
+                                    <div class="" id="v-pills-tabContent">
+                                        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                                            aria-labelledby="v-pills-home-tab">
+                                            <form id="js-login" novalidate="" method="POST" action="/add-user-attribute">
+                                                {{ other_attribute_form.hidden_tag() }}
+                                                <input type="hidden" name="user_id" value="{{user.id}}"/>
+                                                <input type="hidden" name="username" value="{{user.username}}"/>
+                                                <div class="form-group">
+                                                    <input type="hidden" name="is_ssh_key" value="1" />
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ other_attribute_form.user_attributes.label(class="form-label") }}
+                                                    {{ other_attribute_form.user_attributes(class="form-control select-control", placeholder="Select attribute type", autocomplete="off") }}
+                                                    {% if other_attribute_form.user_attributes.errors %}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in other_attribute_form.user_attributes.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="form-group">
+                                                    {{ other_attribute_form.attribute_value.label(class="form-label") }}
+                                                    {{ other_attribute_form.attribute_value(class="form-control", placeholder="value", autocomplete="off") }}
+                                                    {% if other_attribute_form.attribute_value.errors %}
+                                                        <div class="invalid-feedback">
+                                                            {% for error in other_attribute_form.attribute_value.errors %}
+                                                                <span>{{ error }}</span>
+                                                            {% endfor %}
+                                                        </div>
+                                                    {% endif %}
+                                                    <div class="invalid-feedback">No, you missed this one.</div>
+                                                </div>
+                                                <div class="row no-gutters">
+                                                    <div class="col-md-4 ml-auto text-right">
+                                                        <button type="submit" class="btn btn-primary btn-lg mt-3">
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
+                                            aria-labelledby="v-pills-profile-tab">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+    </div>
+    {% endblock content %}
+
+    {% block script %}
+    <script src="{{ url_for('static', filename='js/datagrid/datatables/datatables.bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/datagrid/datatables/datatables.export.js') }}"></script>
+    <script>
+        {% raw %}
+
+        async function editUser(user_id, name) {
+            
+            var linux_user_id = document.getElementById('linux_user_id_' + user_id).value;
+            var department = document.getElementById('department_' + user_id).value;
+            var group_id = document.getElementById('group_selection_' + user_id).value;
+
+            response = await fetch('/edit-user', 
+            {
+                headers: {"Content-Type": "application/json" },
+                method: 'POST',
+                body: JSON.stringify({'user_id': user_id, 'name': name, 'linux_user_id': linux_user_id, 'department': department, 'group_id': group_id})
+            });
+            
+            result = await response.json()
+            if(result.success){
+                window.location.reload();
+                // toastr.success("user edited successfully");
+            }
+            else{
+                console.error(`Error occurred while editing. ${result.error}`)
+                toastr.warning(result.error ? result.error : "Error while editing user")
+            }
+        }
+
+        /* Edit SSH Key */
+        async function editUserAttribute(id) {
+            var value = document.getElementById('value_' + id).value;
+
+            response = await fetch('/edit-user-attribute', 
+            {
+                headers: {"Content-Type": "application/json" },
+                method: 'POST',
+                body: JSON.stringify({'user_attribute_id': id, 'attribute_value': value.toString() })
+            });
+            
+            result = await response.json()
+            if(result.success){
+                window.location.reload()
+                // toastr.success("user edited successfully");
+            }
+            else{
+                console.error(`Error occurred while editing. ${result.error}`)
+                toastr.warning(result.error ? result.error : "Error while editing User Attribute.")
+            }
+        }
+
+        /* Delete SSH Key */
+        async function deleteUserAttribute(id) {
+            var swalWithBootstrapButtons = Swal.mixin(
+            {
+                customClass:
+                {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-danger mr-2"
+                },
+                buttonsStyling: false
+            });
+
+            result = await swalWithBootstrapButtons.fire(
+            {
+                title: "Are you sure?",
+                html: `You are deleting attribute, You won't be able to revert this!`,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+                reverseButtons: true
+            });
+            if(result.value){
+                try{
+                    del_response = await fetch('/delete-user-attribute/' + id, {method: 'DELETE',})
+                    response = await del_response.json()
+                    if (response.success) {
+                        await swalWithBootstrapButtons.fire("Deleted!",`User Attribute has been deleted.`,"success");
+                        window.location.reload(); // Redirect to home or another appropriate page
+                    }
+                    else{
+                            console.error("Error occurred while deleting.")
+                            toastr.warning(response.error)
+                    }
+                }
+                catch(e){
+                    console.error(e);
+                    toastr.warning(`Exception: ${e.message}`);
+                }
+            }
+            else{
+                swalWithBootstrapButtons.fire("Cancelled",`Deletion of tenant attribute is cancelled, you are safe :)`,"error");
+            }
+        }
+        {% endraw %}
+
+
+        $(document).ready(function () {
+
+            // initialize datatable
+            $('.my-datatable').dataTable(
+                {
+                    responsive: true,
+                    lengthChange: true,
+                    language: {
+                        "lengthMenu": "_MENU_"
+                    },
+                    fixedHeader: true,
+                    dom:
+                    /*  --- Layout Structure
+                        --- Options
+                        l   -   length changing input control
+                        f   -   filtering input
+                        t   -   The table!
+                        i   -   Table information summary
+                        p   -   pagination control
+                        r   -   processing display element
+                        B   -   buttons
+                        R   -   ColReorder
+                        S   -   Select
+
+                        --- Markup
+                        < and >             - div element
+                        <"class" and >      - div with a class
+                        <"#id" and >        - div with an ID
+                        <"#id.class" and >  - div with an ID and a class
+
+                        --- Further reading
+                        https://datatables.net/reference/option/dom
+                        --------------------------------------
+                     */
+                        "<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'fl><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+                        "<'row'<'col-sm-12'tr>>" +
+                        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                    buttons: [
+                        // {
+                        //     extend:    'colvis',
+                        //     text:      'Column Visibility',
+                        //     titleAttr: 'Col visibility',
+                        //     className: 'mr-sm-3'
+                        // },
+                        {
+                            extend: 'pdfHtml5',
+                            text: 'PDF',
+                            titleAttr: 'Generate PDF',
+                            className: 'btn-outline-danger btn-sm mr-1'
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            text: 'Excel',
+                            titleAttr: 'Generate Excel',
+                            className: 'btn-outline-success btn-sm mr-1'
+                        },
+                        {
+                            extend: 'csvHtml5',
+                            text: 'CSV',
+                            titleAttr: 'Generate CSV',
+                            className: 'btn-outline-primary btn-sm mr-1'
+                        },
+                        {
+                            extend: 'copyHtml5',
+                            text: 'Copy',
+                            titleAttr: 'Copy to clipboard',
+                            className: 'btn-outline-primary btn-sm mr-1'
+                        },
+                        {
+                            extend: 'print',
+                            text: 'Print',
+                            titleAttr: 'Print Table',
+                            className: 'btn-outline-primary btn-sm'
+                        }
+                    ]
+                });
+
+        });
+
+    </script>
+    </main>
+{% endblock script %}

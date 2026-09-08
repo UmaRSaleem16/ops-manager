@@ -1,0 +1,431 @@
+{% extends "layout.html" %}
+{% block link %}
+    <link rel="stylesheet" media="screen, print"
+          href="{{ url_for('static', filename='css/datagrid/datatables/datatables.bundle.css') }}">
+    <link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/fa-solid.css') }}">
+{% endblock link %}
+
+{% block pageheader %}
+    <!-- the #js-page-content id is needed for some plugins to initialize -->
+    <main id="js-page-content" role="main" class="page-content">
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ title | capitalize }}</li>
+        <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
+    </ol>
+    <div class="subheader">
+        <h1 class="subheader-title">
+            {{ title | capitalize }}
+        </h1>
+    </div>
+{% endblock pageheader %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        Permission Matrix
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-target="#add-permission" data-toggle="modal"
+                                class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-plus"></i>
+                        </button>
+                        <button data-action="panel-collapse" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                                data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <button data-target="#example-modal-centered-transparent_info" data-toggle="modal"
+                                data-offset="0,10" class="btn btn-primary btn-xs btn-icon rounded-circle"
+                                style="margin-right: 5px" data-original-title="Info"><i class="fal fa-info"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <!-- datatable start -->
+                        <table id="dt-basic-example" class="table table-bordered table-hover table-striped w-100">
+                            <thead class="bg-primary-700">
+                            <tr>
+                                <th>ID</th>
+                                <th>Group</th>
+                                <th>Environment</th>
+                                <th>DataCenter</th>
+                                <th>Controls</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if permission_matrix %}
+                            {% for permission in permission_matrix %}
+                            <tr>
+                                <td>
+                                    {{ permission.id }}
+                                </td>
+                                <td>
+                                    {{ permission.group.name }}</a>
+                                </td>
+                                <td>
+                                    {{ permission.environment.name }}</a>
+                                </td>
+                                <td>
+                                    {{ permission.dataCenter.name }}</a>
+                                </td>
+                                <td>
+                                    <div class="row float-right mr-1">
+                                        <form class="mr-1">
+                                            <button class="btn btn-outline-danger btn-sm btn-icon rounded-circle hover-effect-dot waves-effect waves-themed" type="button" onclick="deletePermission('{{ permission.id }}')">
+                                                <i class="fal fa-trash">
+                                                </i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% endif %}
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <th>ID</th>
+                                <th>Group</th>
+                                <th>Environment</th>
+                                <th>DataCenter</th>
+                                <th>Controls</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                        <!-- datatable end -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADD Permission -->
+            <div class="modal fade example-modal-centered-transparent_info" id="add-permission"
+            tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title ">
+                            Add Permission
+                        </h4>
+                        <button type="button" class="close text-black-50" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="">
+                            <div class="">
+                                <div class="" id="v-pills-tabContent">
+                                    <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                                        aria-labelledby="v-pills-home-tab">
+                                        <form id="js-login" novalidate="" method="POST" action="">
+                                            {{ form.hidden_tag() }}
+                                            <div class="form-group">
+                                                {{ form.security_group.label(class="form-label") }}
+                                                {% if form.security_group.errors %}
+                                                    {{ form.security_group(class="form-control select-control", placeholder="-- Select Security Group --") }}
+                                                    <div class="invalid-feedback">
+                                                        {% for error in form.security_group.errors %}
+                                                            <span>{{ error }}</span>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% else %}
+                                                    {{ form.security_group(class="form-control select-control ", placeholder="-- Select Security Group --") }}
+                                                {% endif %}
+                                            </div>
+                                            <div class="form-group">
+                                                {{ form.environment.label(class="form-label", placeholder="Select Environment") }}
+                                                {% if form.environment.errors %}
+                                                    {{ form.environment(class="form-control select-control", placeholder="Select Environment") }}
+                                                    <div class="invalid-feedback">
+                                                        {% for error in form.environment.errors %}
+                                                            <span>{{ error }}</span>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% else %}
+                                                    {{ form.environment(class="form-control select-control", placeholder="Select Environment") }}
+                                                {% endif %}
+                                            </div>
+                                            <div class="form-group">
+                                                {{ form.datacenter.label(class="form-label", placeholder="Select Datacenter") }}
+                                                {% if form.datacenter.errors %}
+                                                    {{ form.datacenter(class="form-control select-control", placeholder="Select Datacenters") }}
+                                                    <div class="invalid-feedback">
+                                                        {% for error in form.datacenter.errors %}
+                                                            <span>{{ error }}</span>
+                                                        {% endfor %}
+                                                    </div>
+                                                {% else %}
+                                                    {{ form.datacenter(class="form-control select-control", placeholder="Select Datacenter") }}
+                                                {% endif %}
+                                            </div>
+                                                <div class="invalid-feedback">No, you missed this one.</div>
+                                                <div class="row no-gutters">
+                                                    <div class="col-md-4 ml-auto text-right">
+                                                        <button type="submit" class="btn btn-primary btn-lg mt-3">
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
+                                        aria-labelledby="v-pills-profile-tab">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+            <!-- Modal Info -->
+            <div class="modal fade example-modal-centered-transparent_info" id="example-modal-centered-transparent_info"
+                 tabindex="-1" role="dialog" aria-hidden="true" style="z-index: 10000">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title ">
+                                Tenants
+                                <small class="m-0 opacity-70">
+                                    A list of all enabled tenants for configured pods.
+                                </small>
+                            </h4>
+                            <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-auto">
+                                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist"
+                                         aria-orientation="vertical">
+                                        <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill"
+                                           href="#v-pills-home" role="tab" aria-controls="v-pills-home"
+                                           aria-selected="true">
+                                            <i class="fal fa-money-bill-wave"></i>
+                                            <span class="hidden-sm-down ml-1">Tenants</span>
+                                        </a>
+                                        <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill"
+                                           href="#v-pills-profile" role="tab" aria-controls="v-pills-profile"
+                                           aria-selected="false">
+                                            <i class="fal fa-cog"></i>
+                                            <span class="hidden-sm-down ml-1">Configuration</span>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="tab-content" id="v-pills-tabContent">
+                                        <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                                             aria-labelledby="v-pills-home-tab">
+                                            <h3>
+                                                <a href="https://wiki.fraudmap.net/confluence/display/development/XCEED+Fraud+Architecture#XCEEDFraudArchitecture-WhatisaTenant?"
+                                                   target="_blank">Tenants</a>
+                                            </h3>
+                                            <p> The financial institutions that send us event data are our "customers".
+                                                However, each customer can have different offerings, like wire, online
+                                                banking, ach etc. In our system, we call these "tenants".
+                                                <br><br>
+                                                For example, StarOne Credit Union is a customer and its different
+                                                offerings viz. retail, wire, achrdfi etc are the different tenants. Each
+                                                such tenant is allocated an id by us which is called a service id. A
+                                                service id is unique inside a pod.
+                                                In our system, a sample tenant name looks like this:
+                                                <br><br>
+                                                <font color="red">StarOneCUCA</font>-<font
+                                                        color="blue">Retail</font>_<font color="green">1777</font>
+                                                <br><br>
+                                                The part in red is called the host_name and the one in blue is called
+                                                the host_service. The green is the service_id at the end.
+                                                <br><br>
+                                                Each tenant has a tenant definition, which constitutes of the tenant
+                                                model and the tenant configuration.
+                                            </p>
+                                            <span class="fs-sm d-flex align-items-center mt-3 flex-wrap">
+                                                                </span>
+                                        </div>
+                                        <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
+                                             aria-labelledby="v-pills-profile-tab">
+                                            <h3>
+                                                Configuration
+                                            </h3>
+                                            <p>
+                                                The tenants.pp files are how tenants show up here. The CommanderData
+                                                program needs to be configured to watch the desired pod. Any
+                                                tenants that are enabled will show up here and depending on the
+                                                components enabled for them, can be managed through this tool.
+                                            </p>
+                                            <p>
+                                                Enabled tenant pp example:
+                                                <br>
+                                                fraudmap4::pod::tenant { "$pod_name:HostName-HostService_ServiceID":
+                                                <br><br>
+                                                The CommanderData program is extremely picky about this line. If you
+                                                mess it up, your tenant could not show up.
+                                            </p>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <!--
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                            -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block script %}
+    <script src="{{ url_for('static', filename='js/datagrid/datatables/datatables.bundle.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/datagrid/datatables/datatables.export.js') }}"></script>
+    <script>
+        
+        {% raw %}
+
+        /* Delete Permission */
+        async function deletePermission(id) {
+            var swalWithBootstrapButtons = Swal.mixin(
+            {
+                customClass:
+                {
+                    confirmButton: "btn btn-primary",
+                    cancelButton: "btn btn-danger mr-2"
+                },
+                buttonsStyling: false
+            });
+
+            result = await swalWithBootstrapButtons.fire(
+            {
+                title: "Are you sure?",
+                html: `You are deleting a permission, You won't be able to revert this!`,
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "No, cancel!",
+                reverseButtons: true
+            });
+            if(result.value){
+                try{
+                    del_response = await fetch('/delete-permission/' + id, {method: 'DELETE',})
+                    response = await del_response.json()
+                    if (response.success) {
+                        await swalWithBootstrapButtons.fire("Deleted!",`Permission has been deleted.`,"success");
+                        window.location.reload(); // Redirect to home or another appropriate page
+                    }
+                    else{
+                            console.error("Error occurred while deleting.")
+                            toastr.warning(response.error)
+                    }
+                }
+                catch(e){
+                    console.error(e);
+                    toastr.warning(`Exception: ${e.message}`);
+                }
+            }
+            else{
+                swalWithBootstrapButtons.fire("Cancelled",`Deletion of permission is cancelled, you are safe :)`,"error");
+            }
+        }
+        {% endraw %}
+
+        $(document).ready(function () {
+
+            // initialize datatable
+            $('#dt-basic-example').dataTable(
+                {
+                    responsive: true,
+                    lengthChange: true,
+                    language: {
+                        "lengthMenu": "_MENU_"
+                    },
+                    fixedHeader: true,
+                    dom:
+                    /*  --- Layout Structure
+                        --- Options
+                        l   -   length changing input control
+                        f   -   filtering input
+                        t   -   The table!
+                        i   -   Table information summary
+                        p   -   pagination control
+                        r   -   processing display element
+                        B   -   buttons
+                        R   -   ColReorder
+                        S   -   Select
+
+                        --- Markup
+                        < and >             - div element
+                        <"class" and >      - div with a class
+                        <"#id" and >        - div with an ID
+                        <"#id.class" and >  - div with an ID and a class
+
+                        --- Further reading
+                        https://datatables.net/reference/option/dom
+                        --------------------------------------
+                     */
+                        "<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'fl><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'B>>" +
+                        "<'row'<'col-sm-12'tr>>" +
+                        "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                    buttons: [
+                        // {
+                        //     extend:    'colvis',
+                        //     text:      'Column Visibility',
+                        //     titleAttr: 'Col visibility',
+                        //     className: 'mr-sm-3'
+                        // },
+                        {
+                            extend: 'pdfHtml5',
+                            text: 'PDF',
+                            titleAttr: 'Generate PDF',
+                            className: 'btn-outline-danger btn-sm mr-1'
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            text: 'Excel',
+                            titleAttr: 'Generate Excel',
+                            className: 'btn-outline-success btn-sm mr-1'
+                        },
+                        {
+                            extend: 'csvHtml5',
+                            text: 'CSV',
+                            titleAttr: 'Generate CSV',
+                            className: 'btn-outline-primary btn-sm mr-1'
+                        },
+                        {
+                            extend: 'copyHtml5',
+                            text: 'Copy',
+                            titleAttr: 'Copy to clipboard',
+                            className: 'btn-outline-primary btn-sm mr-1'
+                        },
+                        {
+                            extend: 'print',
+                            text: 'Print',
+                            titleAttr: 'Print Table',
+                            className: 'btn-outline-primary btn-sm'
+                        }
+                    ]
+                });
+
+        });
+
+    </script>
+    </main>
+{% endblock script %}
