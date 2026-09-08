@@ -1,0 +1,54 @@
+{% extends "login_layout.html" %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-6 ml-auto mr-auto">
+            <div class="card p-4 rounded-plus bg-faded">
+                <form id="js-login" novalidate="" method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control", placeholder="username", autocomplete="off") }}
+                        {% if form.username.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.username.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="invalid-feedback">No, you missed this one.</div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control password-input", placeholder="current password") }}
+                            <i class="fal fa-eye show-password-icon"></i>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.password.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="invalid-feedback">Sorry, you missed this one.</div>
+                    </div>
+                    <div class="row no-gutters">
+                        <div class="col-md-4 ml-auto text-right">
+                            <button type="submit" class="btn btn-primary btn-lg mt-3">Sign in</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row no-gutters">
+                    <div class="col-12">
+                        {% if is_local_setting %}
+                            <a href="{{ url_for('users.register') }}" class="my-2">Register</a> |
+                        {% endif %}
+                        <a href="{{ url_for('users.forgot') }}" class="my2">Forgot Password?</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,87 @@
+{% extends "layout.html" %}
+{% block link %}
+<link rel="stylesheet" media="screen, print"
+    href="{{ url_for('static', filename='css/datagrid/datatables/datatables.bundle.css') }}">
+<link rel="stylesheet" media="screen, print" href="{{ url_for('static', filename='css/fa-solid.css') }}">
+{% endblock link %}
+
+{% block pageheader %}
+<!-- the #js-page-content id is needed for some plugins to initialize -->
+<main id="js-page-content" role="main" class="page-content">
+    <ol class="breadcrumb page-breadcrumb">
+        <li class="breadcrumb-item"><a href="#">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('history.get_history') }}">history</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><a href="{{ url_for('history.get_history') }}">{{id}}</a></li>
+        <li class="position-absolute pos-top pos-right d-none d-sm-block"><span class="js-get-date"></span></li>
+    </ol>
+    <div class="subheader">
+        <h1 class="subheader-title">
+            History Details
+        </h1>
+    </div>
+{% endblock pageheader %}
+
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-12">
+            <div id="panel-1" class="panel">
+                <div class="panel-hdr bg-primary-700">
+                    <h2>
+                        History Detail
+                    </h2>
+                    <div class="panel-toolbar">
+                        <button data-action="panel-collapse"
+                            class="btn btn-primary btn-xs btn-icon rounded-circle"
+                            style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                            data-original-title="Collapse"><i class="fal fa-minus"></i>
+                        </button>
+                        <button data-action="panel-fullscreen"
+                            class="btn btn-primary btn-xs btn-icon rounded-circle"
+                            style="margin-right: 5px" data-toggle="tooltip" data-offset="0,10"
+                            data-original-title="Fullscreen"><i class="fal fa-expand"></i>
+                        </button>
+                        <button data-target="#example-modal-centered-transparent_info"
+                            data-toggle="modal" data-offset="0,10"
+                            class="btn btn-primary btn-xs btn-icon rounded-circle"
+                            style="margin-right: 5px" data-original-title="Info"><i
+                                class="fal fa-info"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        
+                        <div class="row">
+                            {% if after_data %}
+                                <div class="col-md-6">
+                            {% else %}
+                                <div class="col-md-12">
+                            {% endif %}
+                                <div>
+                                    <h3>
+                                        Before
+                                    </h3>
+                                </div>
+                                <!-- JSON data field 1 -->
+                                <pre class="json-field overflow-auto border" id="data-before" style="width:100%; height: 300px; overflow: auto;">{{ before_data | tojson(indent=2) }}</pre>
+                            </div>
+                            {% if after_data %}
+                                <div class="col-md-6">
+                                    <div>
+                                        <h3>
+                                            After
+                                        </h3>
+                                    </div>
+                                    <!-- JSON data field 2 -->
+                                    <pre class="json-field overflow-auto border" id="data-after" style="width:100%; height: 300px; overflow: auto;">{{ after_data | tojson(indent=2) }}</pre>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endblock content %}
